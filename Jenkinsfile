@@ -4,65 +4,63 @@ def DOCKER_HUB_USER="anujsharma1990"
 def HTTP_PORT="8090"
 
 node {
-stages{
-    stage('Initialize'){
-        steps{
-            def dockerHome = tool 'myDocker'
-            def mavenHome  = tool 'myMaven'
-            env.PATH = "${dockerHome}/bin:${mavenHome}/bin:${env.PATH}"
-        }
-    }
-
-    stage('Checkout') {
-        steps{
-            checkout scm
-        }
-    }
-
-    stage('Build'){
-        steps{
-           sh "mvn clean install" 
-        }
-    }
-
-    stage('Sonar'){
-        steps{
-            try {
-                sh "mvn sonar:sonar"
-            } catch(error){
-                echo "The sonar server could not be reached ${error}"
+    stages{
+        stage('Initialize'){
+            steps{
+                def dockerHome = tool 'myDocker'
+                def mavenHome  = tool 'myMaven'
+                env.PATH = "${dockerHome}/bin:${mavenHome}/bin:${env.PATH}"
             }
         }
-        
-     }
 
-    stage("Image Prune"){
-        steps{
-            imagePrune(CONTAINER_NAME)
-        }
-    }
-
-    stage('Image Build'){
-        steps{
-            imageBuild(CONTAINER_NAME, CONTAINER_TAG)
-        }
-    }
-
-    stage('Push to Docker Registry'){
-        steps{
-            withCredentials([usernamePassword(credentialsId: 'dockerHubAccount', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                pushToImage(CONTAINER_NAME, CONTAINER_TAG, USERNAME, PASSWORD)
+        stage('Checkout') {
+            steps{
+                checkout scm
             }
         }
-        
-    }
 
-    stage('Run App'){
-        steps{
-            runApp(CONTAINER_NAME, CONTAINER_TAG, DOCKER_HUB_USER, HTTP_PORT)
+        stage('Build'){
+            steps{
+                sh "mvn clean install" 
+            }
+        }
+
+        stage('Sonar'){
+            steps{
+                try {
+                    sh "mvn sonar:sonar"
+                } catch(error){
+                    echo "The sonar server could not be reached ${error}"
+                }
+            }
+        }
+
+        stage("Image Prune"){
+            steps{
+                imagePrune(CONTAINER_NAME)
+            }
+        }
+
+        stage('Image Build'){
+            steps{
+                imageBuild(CONTAINER_NAME, CONTAINER_TAG)
+            }
+        }
+
+        stage('Push to Docker Registry'){
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'dockerHubAccount', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    pushToImage(CONTAINER_NAME, CONTAINER_TAG, USERNAME, PASSWORD)
+                }
+            } 
+        }
+
+        stage('Run App'){
+            steps{
+                runApp(CONTAINER_NAME, CONTAINER_TAG, DOCKER_HUB_USER, HTTP_PORT)
+            }
         }
     }
-}
 }
 
 def imagePrune(containerName){
