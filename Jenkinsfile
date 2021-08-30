@@ -3,7 +3,7 @@ def CONTAINER_TAG="latest"
 def DOCKER_HUB_USER="anujsharma1990"
 def HTTP_PORT="8090"
 
-node {
+pipeline {
     stages{
         stage('Initialize'){
             steps{
