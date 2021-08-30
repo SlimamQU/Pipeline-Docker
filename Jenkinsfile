@@ -6,43 +6,61 @@ def HTTP_PORT="8090"
 node {
 stages{
     stage('Initialize'){
-        def dockerHome = tool 'myDocker'
-        def mavenHome  = tool 'myMaven'
-        env.PATH = "${dockerHome}/bin:${mavenHome}/bin:${env.PATH}"
+        steps{
+            def dockerHome = tool 'myDocker'
+            def mavenHome  = tool 'myMaven'
+            env.PATH = "${dockerHome}/bin:${mavenHome}/bin:${env.PATH}"
+        }
     }
 
     stage('Checkout') {
-        checkout scm
+        steps{
+            checkout scm
+        }
     }
 
     stage('Build'){
-        sh "mvn clean install"
+        steps{
+           sh "mvn clean install" 
+        }
     }
 
     stage('Sonar'){
-        try {
-            sh "mvn sonar:sonar"
-        } catch(error){
-            echo "The sonar server could not be reached ${error}"
+        steps{
+            try {
+                sh "mvn sonar:sonar"
+            } catch(error){
+                echo "The sonar server could not be reached ${error}"
+            }
         }
+        
      }
 
     stage("Image Prune"){
-        imagePrune(CONTAINER_NAME)
-    }
-
-    stage('Image Build'){
-        imageBuild(CONTAINER_NAME, CONTAINER_TAG)
-    }
-
-    stage('Push to Docker Registry'){
-        withCredentials([usernamePassword(credentialsId: 'dockerHubAccount', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-            pushToImage(CONTAINER_NAME, CONTAINER_TAG, USERNAME, PASSWORD)
+        steps{
+            imagePrune(CONTAINER_NAME)
         }
     }
 
+    stage('Image Build'){
+        steps{
+            imageBuild(CONTAINER_NAME, CONTAINER_TAG)
+        }
+    }
+
+    stage('Push to Docker Registry'){
+        steps{
+            withCredentials([usernamePassword(credentialsId: 'dockerHubAccount', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                pushToImage(CONTAINER_NAME, CONTAINER_TAG, USERNAME, PASSWORD)
+            }
+        }
+        
+    }
+
     stage('Run App'){
-        runApp(CONTAINER_NAME, CONTAINER_TAG, DOCKER_HUB_USER, HTTP_PORT)
+        steps{
+            runApp(CONTAINER_NAME, CONTAINER_TAG, DOCKER_HUB_USER, HTTP_PORT)
+        }
     }
 }
 }
