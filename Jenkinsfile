@@ -4,7 +4,7 @@ def DOCKER_HUB_USER="anujsharma1990"
 def HTTP_PORT="8090"
 
 node {
-
+stages{
     stage('Initialize'){
         def dockerHome = tool 'myDocker'
         def mavenHome  = tool 'myMaven'
@@ -44,7 +44,7 @@ node {
     stage('Run App'){
         runApp(CONTAINER_NAME, CONTAINER_TAG, DOCKER_HUB_USER, HTTP_PORT)
     }
-
+}
 }
 
 def imagePrune(containerName){
