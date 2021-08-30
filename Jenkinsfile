@@ -70,8 +70,8 @@ pipeline {
 
 def imagePrune(containerName){
     try {
-        sh "docker image prune -f"
-        sh "docker stop $containerName"
+        sh "sudo docker image prune -f"
+        sh "sudo docker stop $containerName"
     } catch(error){}
 }
 
