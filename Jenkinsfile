@@ -4,6 +4,7 @@ def DOCKER_HUB_USER="slmlm600"
 def HTTP_PORT="8090"
 
 pipeline {
+    agent any
     stages{
         stage('Initialize'){
             steps{
