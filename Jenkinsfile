@@ -76,7 +76,6 @@ def imagePrune(containerName){
 }
 
 def imageBuild(containerName, tag){
-    sh "sudo su -"
     sh "docker build -t $containerName:$tag  -t $containerName --pull --no-cache ."
     echo "Image build complete"
 }
