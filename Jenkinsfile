@@ -90,5 +90,5 @@ def pushToImage(containerName, tag, dockerUser, dockerPassword){
 def runApp(containerName, tag, dockerHubUser, httpPort){
     sh "sudo docker pull $dockerHubUser/$containerName"
     sh "sudo docker run -d --rm -p $httpPort:$httpPort --name $containerName $dockerHubUser/$containerName:$tag"
-    echo "Application started on port: ${httpPort} (http) (testing from webhook)"
+    echo "Application started on port: ${httpPort} (http) (testing from webhook 1)"
 }
