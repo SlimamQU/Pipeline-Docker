@@ -1,2 +1,0 @@
-this is to update the repo to biuld the jop automatically
-12345
